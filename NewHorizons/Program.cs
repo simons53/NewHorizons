@@ -1,3 +1,7 @@
+using Microsoft.EntityFrameworkCore;
+using NewHorizons.Models;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+
 namespace NewHorizons
 {
     public class Program
@@ -5,6 +9,10 @@ namespace NewHorizons
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+
+            // Add DI for the database
+            builder.Services.AddDbContext<NewHorizonsContext>(options =>
+                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
