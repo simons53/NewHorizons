@@ -42,6 +42,6 @@ namespace NewHorizons.Models
         // Self-Referencing Foreign Key (Replies)
         public int? parent_id { get; set; }
         public ICollection<Comment> Replies { get; set; } = new List<Comment>();
-        public Comment? comment { get; set; } = null!;
+        public Comment? ParentComment { get; set; } = null!;
     }
 }
