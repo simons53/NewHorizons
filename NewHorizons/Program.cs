@@ -14,6 +14,7 @@ namespace NewHorizons
             // Add DI for the database
             builder.Services.AddDbContext<NewHorizonsContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
             builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
                 .AddEntityFrameworkStores<NewHorizonsContext>()
                 .AddDefaultTokenProviders();
