@@ -1,8 +1,6 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Diagnostics.Contracts;
-using System.Diagnostics.Eventing.Reader;
 
 namespace NewHorizons.Models
 {
@@ -11,37 +9,37 @@ namespace NewHorizons.Models
         // Primary Key
         [Key]
         [Display(Name = "Comment ID")]
-        public int comment_id { get; set; }
+        public int CommentId { get; set; }
 
         // Post Body
         [Required]
-        [StringLength(1000)]
+        [StringLength(5000)]
         [Display(Name = "Body")]
         public string Body { get; set; } = string.Empty;
 
         // Created Date/Time
         [Required]
         [Display(Name = "Date Created")]
-        public DateTime created_at { get; set; }
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         // Comment Visibility
         [Required]
         [Display(Name = "Hidden")]
-        public bool is_hidden { get; set; } = false;
+        public bool IsHidden { get; set; } = false;
 
         // Comment belongs to a User
         [Required]
-        public int UserNameId { get; set; }
-        public User_Name UserName { get; set; } = null!;
+        public string AuthorId { get; set; } = string.Empty;
+        public ApplicationUser Author { get; set; } = null!;
 
         // Comment belongs to a Post
-        [ForeignKey("post_id")]
-        public int post_id { get; set; }
-        public Blog_Post Post { get; set; } = null!;
+        public int PostId { get; set; }
+        public BlogPost Post { get; set; } = null!;
 
         // Self-Referencing Foreign Key (Replies)
-        public int? parent_id { get; set; }
+        public int? ParentId { get; set; }
+        public Comment? ParentComment { get; set; }
+
         public ICollection<Comment> Replies { get; set; } = new List<Comment>();
-        public Comment? ParentComment { get; set; } = null!;
     }
 }

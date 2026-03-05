@@ -1,6 +1,7 @@
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using NewHorizons.Models;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using NewHorizons.Models;
 
 namespace NewHorizons
 {
@@ -13,6 +14,9 @@ namespace NewHorizons
             // Add DI for the database
             builder.Services.AddDbContext<NewHorizonsContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+            builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
+                .AddEntityFrameworkStores<NewHorizonsContext>()
+                .AddDefaultTokenProviders();
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
@@ -32,6 +36,7 @@ namespace NewHorizons
 
             app.UseRouting();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.MapControllerRoute(

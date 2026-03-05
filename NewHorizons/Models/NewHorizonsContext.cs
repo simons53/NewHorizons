@@ -1,59 +1,63 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using NewHorizons.Models;
 
 namespace NewHorizons.Models
 {
-    public class NewHorizonsContext : DbContext
+    public class NewHorizonsContext : IdentityDbContext<ApplicationUser>
     {
         public NewHorizonsContext(DbContextOptions<NewHorizonsContext> options) : base(options) 
         { 
 
         }
-        public DbSet<Blog_Post> Posts { get; set; } = null!;
+        public DbSet<BlogPost> Posts { get; set; } = null!;
         public DbSet<Comment> Comments { get; set; } = null!;
-        public DbSet<User_Name> UserNames { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
             // User 1 -> N Blog Posts
-            modelBuilder.Entity<Blog_Post>()
-                .HasOne(p =>p.UserName)
+            modelBuilder.Entity<BlogPost>()
+                .HasOne(p =>p.Author)
                 .WithMany(u => u.Posts)
-                .HasForeignKey(p => p.UserNameId)
+                .HasForeignKey(p => p.AuthorId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             // User 1 => N Comments
             modelBuilder.Entity<Comment>()
-                .HasOne(c => c.UserName)
+                .HasOne(c => c.Author)
                 .WithMany(u => u.Comments)
-                .HasForeignKey(c  => c.UserNameId)
+                .HasForeignKey(c  => c.AuthorId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             // Blog Post 1 -> Comments
             modelBuilder.Entity<Comment>()
                 .HasOne(c => c.Post)
-                .WithMany(p => p.comments)
-                .HasForeignKey(c => c.post_id)
+                .WithMany(p => p.Comments)
+                .HasForeignKey(c => c.PostId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             // Comment 1-> Comment (Replies) (Self-Referencing)
             modelBuilder.Entity<Comment>()
                 .HasOne(c => c.ParentComment)
                 .WithMany(p => p.Replies)
-                .HasForeignKey(c => c.parent_id)
+                .HasForeignKey(c => c.ParentId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             // Indexes
             modelBuilder.Entity<Comment>()
-                .HasIndex(c => c.post_id);
+                .HasIndex(c => c.PostId);
 
             modelBuilder.Entity<Comment>()
-                .HasIndex(c => c.parent_id);
+                .HasIndex(c => c.ParentId);
 
-            modelBuilder.Entity<Blog_Post>()
-                .HasIndex(p => p.UserNameId);
+            modelBuilder.Entity<BlogPost>()
+                .HasIndex(p => p.AuthorId);
+
+            modelBuilder.Entity<ApplicationUser>()
+                .HasIndex(u => u.DisplayName)
+                .IsUnique();
         }
     }
 
