@@ -12,7 +12,7 @@
     <header>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
             <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index"><img height="150" src="images\NewHorizonsClubhouse.png" /></a>
+                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index"><img height="150" src="~/images/NewHorizonsClubhouse.png" /></a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
@@ -22,27 +22,21 @@
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" asp-controller="Home" asp-action="About">About Us</a>
+                            <a class="nav-link text-dark" class="nav-link" asp-controller="Home" asp-action="About">About Us</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" asp-controller="Home" asp-action="WhatWeDo">What We Do</a>
+                            <a class="nav-link text-dark" asp-controller="Home" asp-action="WhatWeDo">What We Do</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" asp-controller="BlogPosts" asp-action="Index">Articles</a>
+                            <a class="nav-link text-dark" asp-controller="BlogPosts" asp-action="Index">Articles</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" asp-controller="Home" asp-action="Contact">Contact</a>
+                            <a class="nav-link text-dark" asp-controller="Home" asp-action="Contact">Contact</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
                         </li>
-            
-                        <li class="nav-item">
-                            <a asp-area="Identity" asp-page="/Account/Login">Sign In</a>
-                        </li>
-                        <li class="nav-item">
-                            <a asp-area="Identity" asp-page="/Account/Register">Register</a>
-                        </li>
+           
                     </ul>
 
                     <partial name="_LoginPartial" />
