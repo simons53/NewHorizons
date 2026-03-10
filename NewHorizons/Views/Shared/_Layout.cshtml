@@ -22,7 +22,26 @@
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
                         <li class="nav-item">
+                            <a class="nav-link" asp-controller="Home" asp-action="About">About Us</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Home" asp-action="WhatWeDo">What We Do</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="BlogPosts" asp-action="Index">Articles</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Home" asp-action="Contact">Contact</a>
+                        </li>
+                        <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                        </li>
+            
+                        <li class="nav-item">
+                            <a asp-area="Identity" asp-page="/Account/Login">Sign In</a>
+                        </li>
+                        <li class="nav-item">
+                            <a asp-area="Identity" asp-page="/Account/Register">Register</a>
                         </li>
                     </ul>
 
