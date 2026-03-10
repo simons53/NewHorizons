@@ -1,8 +1,10 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
 using System.ComponentModel.DataAnnotations;
 
 namespace NewHorizons.Models
 {
+    [Index(nameof(DisplayName), IsUnique = true)]
     public class ApplicationUser : IdentityUser
     {
         // Display name shown publicly on blog posts
