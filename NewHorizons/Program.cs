@@ -1,7 +1,9 @@
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using NewHorizons.Models;
+using NewHorizons.Services;
 
 namespace NewHorizons
 {
@@ -14,12 +16,20 @@ namespace NewHorizons
             // Add DI for the database
             builder.Services.AddDbContext<NewHorizonsContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-            builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
+
+            builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
+            {
+                options.SignIn.RequireConfirmedEmail = true;
+            })
                 .AddEntityFrameworkStores<NewHorizonsContext>()
                 .AddDefaultTokenProviders();
 
+            builder.Services.AddSingleton<IEmailSender, EmailSender>();
+
             // Add services to the container.
             builder.Services.AddControllersWithViews();
+
+            builder.Services.AddRazorPages();
 
             var app = builder.Build();
 
@@ -42,6 +52,8 @@ namespace NewHorizons
             app.MapControllerRoute(
                 name: "default",
                 pattern: "{controller=Home}/{action=Index}/{id?}");
+
+            app.MapRazorPages();
 
             app.Run();
         }
