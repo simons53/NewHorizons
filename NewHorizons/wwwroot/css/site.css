@@ -20,3 +20,144 @@ html {
 body {
   margin-bottom: 60px;
 }
+body {
+    background: rgb(118, 183, 204); 
+    min-height: 100vh;
+}
+
+.card-container {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    padding: 50px 20px;
+    flex-wrap: wrap; 
+}
+
+.capsule-card {
+    background-color: rgba(255, 255, 255, 0.4); 
+    width: 220px;
+    border-radius: 110px;
+    padding: 20px;
+    text-align: center;
+    color: #333;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease;
+}
+
+.capsule-card:hover {
+    transform: translateY(-10px);
+}
+
+.circle-image {
+    width: 180px;
+    height: 180px;
+    margin: 0 auto 20px auto;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 4px solid rgba(255, 255, 255, 0.2);
+}
+
+.circle-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; 
+}
+
+.capsule-card h3 {
+    font-size: 1.1rem;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+
+.capsule-card p {
+    font-size: 0.85rem;
+    line-height: 1.4;
+    padding: 0 10px 40px 10px;
+}
+.navbar {
+    background: linear-gradient(90deg, #ffffff 0%, #fff176 100%) !important;
+    border: none !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    padding: 1rem 2rem;
+}
+
+
+.navbar-brand, .nav-link {
+    color: #444 !important;
+    transition: color 0.2s ease;
+}
+
+    .nav-link:hover {
+        color: #000 !important;
+    }
+/* Container to center everything */
+.horizontal-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 30px;
+    padding: 40px 0;
+}
+
+/* The Long Pill Card */
+.long-pill {
+    display: flex;
+    align-items: center;
+    background-color: rgba(255, 255, 255, 0.4); /* Translucent light blue/white */
+    width: 90%;
+    max-width: 900px;
+    border-radius: 100px; /* This creates the rounded ends */
+    overflow: hidden; /* Clips the image to the curve */
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: transform 0.3s ease;
+}
+
+    .long-pill:hover {
+        transform: scale(1.02);
+    }
+
+/* Image Section */
+.pill-image {
+    flex: 0 0 350px; /* Fixed width for the image part */
+    height: 220px;
+}
+
+    .pill-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 80px; /* Extra rounding inside to match your screenshot */
+        padding: 10px; /* Creates that "inset" look from your image */
+    }
+
+/* Text Section */
+.pill-content {
+    flex: 1;
+    padding: 20px 50px 20px 20px;
+    color: #083358; /* Dark blue for readability */
+}
+
+    .pill-content p {
+        margin: 0;
+        font-size: 0.95rem;
+        line-height: 1.6;
+    }
+
+/* Mobile Responsive Fix */
+@media (max-width: 768px) {
+    .long-pill {
+        flex-direction: column;
+        border-radius: 40px;
+        text-align: center;
+    }
+
+    .pill-image {
+        flex: 0 0 auto;
+        width: 100%;
+    }
+
+    .pill-content {
+        padding: 20px;
+    }
+}

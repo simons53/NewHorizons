@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using NewHorizons.Models;
 using NewHorizons.Services;
+using Microsoft.AspNetCore.Identity.UI.Services;
 
 namespace NewHorizons
 {
