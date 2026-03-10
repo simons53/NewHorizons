@@ -1,14 +1,43 @@
 ﻿using Microsoft.AspNetCore.Identity.UI.Services;
-using System.Threading.Tasks;
+using System.Net;
+using System.Net.Mail;
 
 namespace NewHorizons.Services
 {
     public class EmailSender : IEmailSender
     {
-        public Task SendEmailAsync(string email, string subject, string htmlMessage)
+        private readonly IConfiguration _config;
+
+        public EmailSender(IConfiguration config)
         {
-            // No-op for development (email not actually sent)
-            return Task.CompletedTask;
+            _config = config;
+        }
+
+        public async Task SendEmailAsync(string email, string subject, string htmlMessage)
+        {
+            var smtpHost = _config["Email:SmtpServer"];
+            var smtpPort = _config.GetValue<int>("Email:Port");
+            var username = _config["Email:Username"];
+            var password = _config["Email:Password"];
+            var fromEmail = _config["Email:From"];
+
+            using var client = new SmtpClient(smtpHost, smtpPort)
+            {
+                Credentials = new NetworkCredential(username, password),
+                EnableSsl = true
+            };
+
+            var mail = new MailMessage
+            {
+                From = new MailAddress(fromEmail),
+                Subject = subject,
+                Body = htmlMessage,
+                IsBodyHtml = true
+            };
+
+            mail.To.Add(email);
+
+            await client.SendMailAsync(mail);
         }
     }
 }
