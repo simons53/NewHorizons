@@ -23,6 +23,13 @@ namespace NewHorizons
                 .AddEntityFrameworkStores<NewHorizonsContext>()
                 .AddDefaultTokenProviders();
 
+            builder.Services.AddAuthentication()
+                .AddGoogle(options =>
+                {
+                    options.ClientId = builder.Configuration["Authentication:Google:ClientId"];
+                    options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
+                });
+
             builder.Services.AddSingleton<IEmailSender, EmailSender>();
 
             // Add services to the container.

@@ -85,6 +85,11 @@ namespace NewHorizons.Areas.Identity.Pages.Account
             [Required]
             [EmailAddress]
             public string Email { get; set; }
+
+            [Required]
+            [Display(Name = "Display Name")]
+            [StringLength(25)]
+            public string DisplayName { get; set; }
         }
         
         public IActionResult OnGet() => RedirectToPage("./Login");
@@ -128,11 +133,13 @@ namespace NewHorizons.Areas.Identity.Pages.Account
                 // If the user does not have an account, then ask the user to create an account.
                 ReturnUrl = returnUrl;
                 ProviderDisplayName = info.ProviderDisplayName;
+                var name = info.Principal.FindFirst(System.Security.Claims.ClaimTypes.Name)?.Value;
                 if (info.Principal.HasClaim(c => c.Type == ClaimTypes.Email))
                 {
                     Input = new InputModel
                     {
-                        Email = info.Principal.FindFirstValue(ClaimTypes.Email)
+                        Email = info.Principal.FindFirstValue(ClaimTypes.Email),
+                        DisplayName = name ?? ""
                     };
                 }
                 return Page();
@@ -152,10 +159,14 @@ namespace NewHorizons.Areas.Identity.Pages.Account
 
             if (ModelState.IsValid)
             {
-                var user = CreateUser();
+                var name = info.Principal.FindFirst(System.Security.Claims.ClaimTypes.Name)?.Value;
 
-                await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
-                await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
+                var user = new ApplicationUser
+                {
+                    UserName = Guid.NewGuid().ToString(), // Internal ID
+                    Email = Input.Email,
+                    DisplayName = string.IsNullOrEmpty(Input.DisplayName) ? name ?? "" : Input.DisplayName
+                };
 
                 var result = await _userManager.CreateAsync(user);
                 if (result.Succeeded)

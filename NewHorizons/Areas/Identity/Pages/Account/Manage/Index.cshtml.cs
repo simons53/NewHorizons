@@ -56,6 +56,12 @@ namespace NewHorizons.Areas.Identity.Pages.Account.Manage
             ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
             ///     directly from your code. This API may change or be removed in future releases.
             /// </summary>
+            
+            [Required]
+            [Display(Name = "User Name")]
+            [StringLength(25)]
+            public string DisplayName { get; set; } = string.Empty;
+            
             [Phone]
             [Display(Name = "Phone number")]
             public string PhoneNumber { get; set; }
@@ -65,6 +71,11 @@ namespace NewHorizons.Areas.Identity.Pages.Account.Manage
         {
             var userName = await _userManager.GetUserNameAsync(user);
             var phoneNumber = await _userManager.GetPhoneNumberAsync(user);
+
+            Input = new InputModel
+            {
+                DisplayName = user.DisplayName
+            };
 
             Username = userName;
 
@@ -109,6 +120,11 @@ namespace NewHorizons.Areas.Identity.Pages.Account.Manage
                     StatusMessage = "Unexpected error when trying to set phone number.";
                     return RedirectToPage();
                 }
+            }
+            if (Input.DisplayName != user.DisplayName)
+            {
+                user.DisplayName = Input.DisplayName;
+                await _userManager.UpdateAsync(user);
             }
 
             await _signInManager.RefreshSignInAsync(user);
