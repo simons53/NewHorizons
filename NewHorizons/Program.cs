@@ -30,6 +30,9 @@ namespace NewHorizons
                     options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
                 });
 
+            var emailConfig = builder.Configuration.GetSection("Authentication:Email");
+
+
             builder.Services.AddSingleton<IEmailSender, EmailSender>();
 
             // Add services to the container.
