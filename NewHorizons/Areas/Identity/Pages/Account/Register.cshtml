@@ -18,9 +18,11 @@
                 <span asp-validation-for="Input.Email" class="text-danger"></span>
             </div>
             <div class="form-floating mb-3">
-                <input asp-for="Input.DisplayName" class="form-control" />
+                <input asp-for="Input.DisplayName" class="form-control" id="displayNameInput" />
                 <label asp-for="Input.DisplayName"></label>
                 <span asp-validation-for="Input.DisplayName" class="text-danger"></span>
+                <div id="displayNameFeedback" class="form-text text-danger"></div>
+
             </div>
             <div class="form-floating mb-3">
                 <input asp-for="Input.Password" class="form-control" autocomplete="new-password" aria-required="true" placeholder="password" />
@@ -69,4 +71,41 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const displayNameInput = document.getElementById("displayNameInput");
+            const feedback = document.getElementById("displayNameFeedback");
+            const registerBtn = document.getElementById("registerSubmit");
+            let debounceTimeout = null;
+
+            if (!displayNameInput || !feedback || !registerBtn) return;
+
+            displayNameInput.addEventListener("input", function () {
+                clearTimeout(debounceTimeout);
+
+                const displayName = this.value.trim();
+
+                if (!displayName) {
+                    feedback.textContent = "";
+                    registerBtn.disabled = false;
+                    return;
+                }
+
+                debounceTimeout = setTimeout(async () => {
+                    try {
+                        const response = await fetch(`/api/UserValidation/CheckDisplayName?displayName=${encodeURIComponent(displayName)}`);
+                        const data = await response.json();
+
+                        feedback.textContent = data.isTaken ? "This display name is already taken." : "Display Name Available!";
+                        registerBtn.disabled = data.isTaken;
+
+                    } catch (err) {
+                        console.error("Error checking display name:", err);
+                        feedback.textContent = "Error checking display name.";
+                        registerBtn.disabled = false;
+                    }
+                }, 400);
+            });
+        });
+    </script>
 }
