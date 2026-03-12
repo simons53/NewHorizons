@@ -1,65 +1,42 @@
 ﻿@model IEnumerable<NewHorizons.Models.BlogPost>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Articles";
 }
 
-<h1>Index</h1>
+<div class="articles-page">
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.IsPublic)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Title)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.BodyHtml)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.CreatedAt)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.CommentsEnabled)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Author)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.IsPublic)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Title)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.BodyHtml)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.CreatedAt)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.CommentsEnabled)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Author.Id)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.PostId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.PostId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.PostId">Delete</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+    <div class="articles-header">
+        Click an article to read further and leave a comment!
+    </div>
+
+    <div class="articles-container">
+
+        @foreach (var item in Model)
+        {
+            <a class="article-card" asp-action="Details" asp-route-id="@item.PostId">
+
+                <div class="article-image">
+                    <img src="~/images/article-placeholder.jpg" alt="Article Image" />
+                </div>
+
+                <div class="article-content">
+                    <h3>@item.Title</h3>
+
+                    <p>
+                        @(item.BodyHtml.Length > 150
+                            ? item.BodyHtml.Substring(0, 150) + "..."
+                            : item.BodyHtml)
+                </p>
+            </div>
+
+            </a>
+                }
+
+    </div>
+
+    <div class="write-article">
+        <a class="btn-write" asp-action="Create">Write An Article</a>
+    </div>
+
+</div>
