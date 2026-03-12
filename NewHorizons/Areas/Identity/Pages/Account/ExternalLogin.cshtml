@@ -8,9 +8,9 @@
 <h2 id="external-login-title">Associate your @Model.ProviderDisplayName account.</h2>
 <hr />
 
-<p id="external-login-description" class="text-info">
+<p id="external-login-description">
     You've successfully authenticated with <strong>@Model.ProviderDisplayName</strong>.
-    Please enter an email address for this site below and click the Register button to finish
+    Please enter a Display Name for this site below and click the Register button to finish
     logging in.
 </p>
 
@@ -19,9 +19,16 @@
         <form asp-page-handler="Confirmation" asp-route-returnUrl="@Model.ReturnUrl" method="post">
             <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
             <div class="form-floating mb-3">
-                <input asp-for="Input.Email" class="form-control" autocomplete="email" placeholder="Please enter your email."/>
+                <input asp-for="Input.Email" class="form-control" autocomplete="email" readonly/>
                 <label asp-for="Input.Email" class="form-label"></label>
                 <span asp-validation-for="Input.Email" class="text-danger"></span>
+            </div>
+            <div class="form-floating mb-3">
+                <input asp-for="Input.DisplayName" class="form-control" id="displayNameInput" />
+                <label asp-for="Input.DisplayName">Display Name</label>
+                <span asp-validation-for="Input.DisplayName" class="text-danger"></span>
+                <div id="displayNameFeedback" class="form-text text-danger"></div>
+
             </div>
             <button type="submit" class="w-100 btn btn-lg btn-primary">Register</button>
         </form>
@@ -30,4 +37,41 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const displayNameInput = document.getElementById("displayNameInput");
+            const feedback = document.getElementById("displayNameFeedback");
+            const submitBtn = document.getElementById("externalSubmit") || document.querySelector("button[type='submit']");
+            let debounceTimeout = null;
+
+            if (!displayNameInput || !feedback || !submitBtn) return;
+
+            displayNameInput.addEventListener("input", function () {
+                clearTimeout(debounceTimeout);
+
+                const displayName = this.value.trim();
+
+                if (!displayName) {
+                    feedback.textContent = "";
+                    submitBtn.disabled = false;
+                    return;
+                }
+
+                debounceTimeout = setTimeout(async () => {
+                    try {
+                        const response = await fetch(`/api/UserValidation/CheckDisplayName?displayName=${encodeURIComponent(displayName)}`);
+                        const data = await response.json();
+
+                        feedback.textContent = data.isTaken ? "This display name is already taken." : "Available!";
+                        submitBtn.disabled = data.isTaken;
+
+                    } catch (err) {
+                        console.error("Error checking display name:", err);
+                        feedback.textContent = "Error checking display name.";
+                        submitBtn.disabled = false;
+                    }
+                }, 400);
+            });
+        });
+    </script>
 }

@@ -15,11 +15,11 @@ namespace NewHorizons.Services
 
         public async Task SendEmailAsync(string email, string subject, string htmlMessage)
         {
-            var smtpHost = _config["Email:SmtpServer"];
-            var smtpPort = _config.GetValue<int>("Email:Port");
-            var username = _config["Email:Username"];
-            var password = _config["Email:Password"];
-            var fromEmail = _config["Email:From"];
+            var smtpHost = _config["Authentication:Email:SmtpHost"];
+            var smtpPort = _config.GetValue<int>("Authentication:Email:SmtpPort");
+            var username = _config["Authentication:Email:Username"];
+            var password = _config["Authentication:Email:Password"];
+            var fromEmail = _config["Authentication:Email:From"];
 
             using var client = new SmtpClient(smtpHost, smtpPort)
             {
