@@ -1,0 +1,36 @@
+﻿@model IEnumerable<NewHorizons.Models.Comment>
+
+<h2>Comments</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Author</th>
+            <th>Post</th>
+            <th>Body</th>
+            <th>Date</th>
+            <th>Hidden</th>
+            <th></th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @foreach (var comment in Model)
+        {
+            <tr>
+                <td>@comment.Author?.DisplayName</td>
+                <td>@comment.Post?.Title</td>
+                <td>@comment.Body</td>
+                <td>@comment.CreatedAt</td>
+                <td>@comment.IsHidden</td>
+
+                <td>
+                    <a asp-action="Details" asp-route-id="@comment.CommentId">Details</a> |
+                    <a asp-action="Edit" asp-route-id="@comment.CommentId">Edit</a> |
+                    <a asp-action="Delete" asp-route-id="@comment.CommentId">Delete</a> |
+                    <a asp-action="ToggleHidden" asp-route-id="@comment.CommentId">Toggle Hidden</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

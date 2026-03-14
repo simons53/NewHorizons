@@ -2,6 +2,7 @@
 
 @{
     ViewData["Title"] = "User Management";
+    var userRoles = ViewBag.UserRoles as Dictionary<string, bool>;
 }
 
 <h1>User Management</h1>
@@ -12,6 +13,7 @@
             <th>Email</th>
             <th>Display Name</th>
             <th>Email Confirmed</th>
+            <th>Admin</th>
             <th>Actions</th>
         </tr>
     </thead>
@@ -22,6 +24,7 @@
                 <td>@user.Email</td>
                 <td>@user.DisplayName</td>
                 <td>@user.EmailConfirmed</td>
+                <td>@(userRoles != null && userRoles.ContainsKey(user.Id) && userRoles[user.Id] ? "Yes" : "No")</td>
                 <td>
                     <a asp-area="Admin"
                        asp-controller="Users"

@@ -2,6 +2,8 @@
 
 @{
     ViewData["Title"] = "User Details";
+    var roles = (IList<string>)ViewBag.Roles;
+    bool isAdmin = roles.Contains("Admin");
 }
 
 <h2>User Details</h2>
@@ -25,17 +27,28 @@
 </div>
 
 <br />
-<a asp-area="Admin"
-   asp-controller="Users"
-   asp-action="ToggleAdmin"
-   asp-route-id="@Model.Id"
-   class="btn btn-warning">
-    Toggle Admin Role
-</a>
+<div class="d-flex gap-2 align-items-center">
+    <form asp-area="Admin" asp-controller="Users" asp-action="ToggleAdmin" method="post">
 
-<a asp-area="Admin"
-   asp-controller="Users"
-   asp-action="Index"
-   class="btn btn-secondary">
-    Back
-</a>
+        @if (User.IsInRole("Admin") && Model.UserName != User.Identity.Name)
+        {
+            <input type="hidden" name="id" value="@Model.Id" />
+            <button type="submit" class="btn @(roles.Contains("Admin") ? "btn-danger" : "btn-warning") btn-toggle">
+                @(roles.Contains("Admin") ? "Revoke Admin" : "Make Admin")
+            </button>
+            <a asp-area="Admin"
+               asp-controller="Users"
+               asp-action="Delete"
+               asp-route-id="@Model.Id"
+               class="btn btn-toggle btn-danger">
+                Delete User
+            </a>
+        }
+        <a asp-area="Admin"
+           asp-controller="Users"
+           asp-action="Index"
+           class="btn btn-secondary btn-toggle">
+            Back
+        </a>
+    </form>
+</div>

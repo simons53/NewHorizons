@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
 using NewHorizons.Models;
+using System.Security.Claims;
 
 namespace NewHorizons.Areas.Identity.Pages.Account
 {
@@ -127,6 +128,13 @@ namespace NewHorizons.Areas.Identity.Pages.Account
 
                 if (result.Succeeded)
                 {
+                    var claims = new List<Claim>
+                    {
+                        new Claim("DisplayName", user.DisplayName ?? "")
+                    };
+
+                    await _signInManager.SignInWithClaimsAsync(user, Input.RememberMe, claims);
+                    
                     _logger.LogInformation("User logged in.");
                     return LocalRedirect(returnUrl);
                 }

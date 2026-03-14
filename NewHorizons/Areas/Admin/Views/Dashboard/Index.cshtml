@@ -6,8 +6,37 @@
 
 <p>Welcome to the NewHorizons administration panel.</p>
 
-<ul>
-    <li><a href="/Admin/users">User Management</a></li>
-    <li><a href="#">Site Settings</a></li>
-    <li><a href="#">Content</a></li>
+<ul style="list-style-type: none;">
+    <li class="nav-item" style="padding: 1%;">
+        <a class="btn btn-primary"
+           asp-area="Admin"
+           asp-controller="Users"
+           asp-action="Index">
+           Manage Users
+        </a>
+    </li>
+    <li class="nav-item" style="padding: 1%;">
+        <a class="btn btn-primary"
+           asp-area="Admin" 
+            asp-controller="Comments" 
+            asp-action="Index">
+            Manage Comments
+        </a>
+    </li>
+    <li class="nav-item" style="padding: 1%;">
+        <a class="btn btn-primary"
+           asp-area="Admin"
+           asp-controller="Comments"
+           asp-action="Moderation">
+            Moderate Comments
+        </a>
+    </li>
+    <li class="nav-item" style="padding: 1%;">
+        <a class="btn btn-primary"
+           asp-area="Admin"
+           asp-controller="Articles"
+           asp-action="Index">
+            Manage Articles
+        </a>
+    </li>
 </ul>

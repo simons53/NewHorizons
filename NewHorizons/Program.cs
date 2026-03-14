@@ -48,6 +48,11 @@ namespace NewHorizons
                 {
                     await roleManager.CreateAsync(new IdentityRole("Admin"));
                 }
+
+                if (!await roleManager.RoleExistsAsync("User"))
+                {
+                    await roleManager.CreateAsync(new IdentityRole("User"));
+                }
             }
 
             // Configure the HTTP request pipeline.
@@ -72,6 +77,23 @@ namespace NewHorizons
                 name: "default",
                 pattern: "{controller=Home}/{action=Index}/{id?}");
             app.Run();
+
+
+            // --- Role seeding method ---
+            static async Task SeedRolesAsync(IServiceProvider serviceProvider)
+            {
+                var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+
+                string[] roleNames = { "Admin", "User" };
+
+                foreach (var roleName in roleNames)
+                {
+                    if (!await roleManager.RoleExistsAsync(roleName))
+                    {
+                        await roleManager.CreateAsync(new IdentityRole(roleName));
+                    }
+                }
+            }
         }
     }
 }

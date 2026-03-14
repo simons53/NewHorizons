@@ -1,0 +1,31 @@
+﻿@model NewHorizons.Models.ApplicationUser
+@{
+    ViewData["Title"] = "Delete User";
+    var roles = (IList<string>)ViewBag.Roles;
+}
+
+<h2>Delete User</h2>
+
+<div class="alert alert-warning">
+    <strong>Warning:</strong> You are about to delete the following user:
+</div>
+
+<div class="card mb-3">
+    <div class="card-body">
+        <p><strong>Email:</strong> @Model.Email</p>
+        <p><strong>Display Name:</strong> @Model.DisplayName</p>
+        <p>
+            <strong>Roles:</strong>
+            @foreach (var role in roles)
+            {
+                <span class="badge @(role == "Admin" ? "bg-danger" : "bg-primary")">@role</span>
+            }
+        </p>
+    </div>
+</div>
+
+<form asp-area="Admin" asp-controller="Users" asp-action="DeleteConfirmed" method="post">
+    <input type="hidden" name="id" value="@Model.Id" />
+    <button type="submit" class="btn btn-danger btn-toggle">Confirm Delete</button>
+    <a asp-area="Admin" asp-controller="Users" asp-action="Details" asp-route-id="@Model.Id" class="btn btn-secondary btn-toggle">Cancel</a>
+</form>

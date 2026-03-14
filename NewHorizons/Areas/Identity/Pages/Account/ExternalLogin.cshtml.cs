@@ -194,7 +194,12 @@ namespace NewHorizons.Areas.Identity.Pages.Account
                             return RedirectToPage("./RegisterConfirmation", new { Email = Input.Email });
                         }
 
-                        await _signInManager.SignInAsync(user, isPersistent: false, info.LoginProvider);
+                        var claims = new List<Claim>
+                        {
+                            new Claim("DisplayName", user.DisplayName ?? "")
+                        };
+
+                        await _signInManager.SignInWithClaimsAsync(user, false, claims);
                         return LocalRedirect(returnUrl);
                     }
                 }

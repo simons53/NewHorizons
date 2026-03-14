@@ -7,7 +7,6 @@
 <ul class="navbar-nav">
     @if (SignInManager.IsSignedIn(User))
     {
-        var user = await UserManager.GetUserAsync(User);
 
         <li class="nav-item">
             <a id="manage"
@@ -15,7 +14,7 @@
                asp-area="Identity"
                asp-page="/Account/Manage/Index"
                asp-route-area="Identity">
-                Hello @user.DisplayName!
+                Hello @User.FindFirst("DisplayName")?.Value!
             </a>
         </li>
     @if (User.IsInRole("Admin"))
