@@ -1,0 +1,41 @@
+﻿@model NewHorizons.Models.ApplicationUser
+
+@{
+    ViewData["Title"] = "User Details";
+}
+
+<h2>User Details</h2>
+
+<div class="card">
+    <div class="card-body">
+
+        <p><strong>Email:</strong> @Model.Email</p>
+        <p><strong>Display Name:</strong> @Model.DisplayName</p>
+        <p><strong>Email Confirmed:</strong> @Model.EmailConfirmed</p>
+
+        <p>
+            <strong>Roles:</strong>
+            @foreach (var role in (IList<string>)ViewBag.Roles)
+            {
+                <span class="badge bg-primary">@role</span>
+            }
+        </p>
+
+    </div>
+</div>
+
+<br />
+<a asp-area="Admin"
+   asp-controller="Users"
+   asp-action="ToggleAdmin"
+   asp-route-id="@Model.Id"
+   class="btn btn-warning">
+    Toggle Admin Role
+</a>
+
+<a asp-area="Admin"
+   asp-controller="Users"
+   asp-action="Index"
+   class="btn btn-secondary">
+    Back
+</a>
