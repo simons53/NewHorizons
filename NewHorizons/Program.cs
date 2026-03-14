@@ -21,6 +21,9 @@ namespace NewHorizons
                 .AddEntityFrameworkStores<NewHorizonsContext>()
                 .AddDefaultTokenProviders();
 
+            // Register your custom ClaimsPrincipal factory
+            builder.Services.AddScoped<IUserClaimsPrincipalFactory<ApplicationUser>, ApplicationUserClaimsPrincipalFactory>();
+
             // Authentication
             builder.Services.AddAuthentication()
                 .AddGoogle(options =>

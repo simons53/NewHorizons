@@ -2,14 +2,16 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 #nullable disable
 
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.WebUtilities;
+using NewHorizons.Models;
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
-using NewHorizons.Models;
 
 namespace NewHorizons.Areas.Identity.Pages.Account.Manage
 {
@@ -17,13 +19,16 @@ namespace NewHorizons.Areas.Identity.Pages.Account.Manage
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly IEmailSender _emailSender;
 
         public IndexModel(
             UserManager<ApplicationUser> userManager,
-            SignInManager<ApplicationUser> signInManager)
+            SignInManager<ApplicationUser> signInManager,
+            IEmailSender emailSender)
         {
             _userManager = userManager;
             _signInManager = signInManager;
+            _emailSender = emailSender;
         }
 
         /// <summary>
@@ -65,6 +70,11 @@ namespace NewHorizons.Areas.Identity.Pages.Account.Manage
             [Phone]
             [Display(Name = "Phone number")]
             public string PhoneNumber { get; set; }
+
+            [Required]
+            [EmailAddress]
+            [Display(Name = "Email")]
+            public string Email { get; set; }
         }
 
         private async Task LoadAsync(ApplicationUser user)
@@ -74,26 +84,31 @@ namespace NewHorizons.Areas.Identity.Pages.Account.Manage
 
             Input = new InputModel
             {
-                DisplayName = user.DisplayName
+                DisplayName = user.DisplayName,
+                Email = user.Email,         // include email here if you want prefill
+                PhoneNumber = phoneNumber
             };
 
             Username = userName;
-
-            Input = new InputModel
-            {
-                PhoneNumber = phoneNumber
-            };
         }
 
         public async Task<IActionResult> OnGetAsync()
         {
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
-            {
-                return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
-            }
+                return NotFound("User not found.");
 
-            await LoadAsync(user);
+            var logins = await _userManager.GetLoginsAsync(user);
+            var isExternal = logins.Any(); // true if user has any external login
+
+            Input = new InputModel
+            {
+                DisplayName = user.DisplayName,
+                Email = user.Email
+            };
+
+            ViewData["IsExternalLogin"] = isExternal;
+
             return Page();
         }
 
@@ -101,34 +116,60 @@ namespace NewHorizons.Areas.Identity.Pages.Account.Manage
         {
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
-            {
-                return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
-            }
+                return NotFound("User not found.");
+
+            var logins = await _userManager.GetLoginsAsync(user);
+            var isExternal = logins.Any();
 
             if (!ModelState.IsValid)
-            {
-                await LoadAsync(user);
                 return Page();
-            }
 
-            var phoneNumber = await _userManager.GetPhoneNumberAsync(user);
-            if (Input.PhoneNumber != phoneNumber)
-            {
-                var setPhoneResult = await _userManager.SetPhoneNumberAsync(user, Input.PhoneNumber);
-                if (!setPhoneResult.Succeeded)
-                {
-                    StatusMessage = "Unexpected error when trying to set phone number.";
-                    return RedirectToPage();
-                }
-            }
+            bool updated = false;
+
+            // Update DisplayName
             if (Input.DisplayName != user.DisplayName)
             {
                 user.DisplayName = Input.DisplayName;
-                await _userManager.UpdateAsync(user);
+                updated = true;
             }
 
+            // Update Email only for non-external users
+            if (!isExternal && Input.Email != user.Email)
+            {
+                var setEmailResult = await _userManager.SetEmailAsync(user, Input.Email);
+                if (!setEmailResult.Succeeded)
+                {
+                    foreach (var error in setEmailResult.Errors)
+                        ModelState.AddModelError(string.Empty, error.Description);
+                    return Page();
+                }
+
+                // Reset EmailConfirmed
+                user.EmailConfirmed = false;
+                updated = true;
+
+                // Send confirmation email
+                var userId = await _userManager.GetUserIdAsync(user);
+                var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+                code = WebEncoders.Base64UrlEncode(System.Text.Encoding.UTF8.GetBytes(code));
+                var callbackUrl = Url.Page(
+                    "/Account/ConfirmEmail",
+                    pageHandler: null,
+                    values: new { area = "Identity", userId, code },
+                    protocol: Request.Scheme);
+
+                await _emailSender.SendEmailAsync(Input.Email,
+                    "Confirm your new email",
+                    $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+            }
+
+            if (updated)
+                await _userManager.UpdateAsync(user);
+
             await _signInManager.RefreshSignInAsync(user);
-            StatusMessage = "Your profile has been updated";
+
+            StatusMessage = "Your profile has been updated. Please check your email to confirm any changes to your email address.";
+
             return RedirectToPage();
         }
     }
