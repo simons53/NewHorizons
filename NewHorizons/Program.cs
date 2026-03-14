@@ -1,8 +1,5 @@
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Infrastructure;
 using NewHorizons.Models;
 using NewHorizons.Services;
 using Microsoft.AspNetCore.Identity.UI.Services;
@@ -15,14 +12,16 @@ namespace NewHorizons
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Add DI for the database
+            // Database
             builder.Services.AddDbContext<NewHorizonsContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+            // Identity
             builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
                 .AddEntityFrameworkStores<NewHorizonsContext>()
                 .AddDefaultTokenProviders();
 
+            // Authentication
             builder.Services.AddAuthentication()
                 .AddGoogle(options =>
                 {
@@ -30,32 +29,27 @@ namespace NewHorizons
                     options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
                 });
 
-            var emailConfig = builder.Configuration.GetSection("Authentication:Email");
-
-
             builder.Services.AddSingleton<IEmailSender, EmailSender>();
 
-            // Add services to the container.
+            // MVC
             builder.Services.AddControllersWithViews();
             builder.Services.AddRazorPages();
+
             var app = builder.Build();
 
+            // --- Seed roles and admin user ---
             using (var scope = app.Services.CreateScope())
             {
-                var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+                var services = scope.ServiceProvider;
 
-                if (!await roleManager.RoleExistsAsync("Admin"))
-                {
-                    await roleManager.CreateAsync(new IdentityRole("Admin"));
-                }
+                // Seed roles
+                await SeedRolesAsync(services);
 
-                if (!await roleManager.RoleExistsAsync("User"))
-                {
-                    await roleManager.CreateAsync(new IdentityRole("User"));
-                }
+                // Seed single admin user
+                await SeedAdminAsync(services);
             }
 
-            // Configure the HTTP request pipeline.
+            // HTTP pipeline
             if (!app.Environment.IsDevelopment())
             {
                 app.UseExceptionHandler("/Home/Error");
@@ -64,11 +58,10 @@ namespace NewHorizons
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
-
             app.UseRouting();
-
             app.UseAuthentication();
             app.UseAuthorization();
+
             app.MapRazorPages();
             app.MapControllerRoute(
                 name: "areas",
@@ -76,23 +69,54 @@ namespace NewHorizons
             app.MapControllerRoute(
                 name: "default",
                 pattern: "{controller=Home}/{action=Index}/{id?}");
+
             app.Run();
+        }
 
+        // --- Seed roles method ---
+        private static async Task SeedRolesAsync(IServiceProvider serviceProvider)
+        {
+            var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+            string[] roleNames = { "Admin", "User" };
 
-            // --- Role seeding method ---
-            static async Task SeedRolesAsync(IServiceProvider serviceProvider)
+            foreach (var roleName in roleNames)
             {
-                var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-
-                string[] roleNames = { "Admin", "User" };
-
-                foreach (var roleName in roleNames)
+                if (!await roleManager.RoleExistsAsync(roleName))
                 {
-                    if (!await roleManager.RoleExistsAsync(roleName))
-                    {
-                        await roleManager.CreateAsync(new IdentityRole(roleName));
-                    }
+                    await roleManager.CreateAsync(new IdentityRole(roleName));
                 }
+            }
+        }
+
+        // --- Seed single admin user ---
+        private static async Task SeedAdminAsync(IServiceProvider serviceProvider)
+        {
+            var userManager = serviceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+            var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+
+            // Ensure Admin role exists
+            if (!await roleManager.RoleExistsAsync("Admin"))
+                await roleManager.CreateAsync(new IdentityRole("Admin"));
+
+            var adminEmail = "admin@example.com";
+            var adminUser = await userManager.FindByEmailAsync(adminEmail);
+
+            if (adminUser == null)
+            {
+                adminUser = new ApplicationUser
+                {
+                    UserName = adminEmail,
+                    Email = adminEmail,
+                    DisplayName = "Admin"
+                };
+
+                var createResult = await userManager.CreateAsync(adminUser, "Admin@123");
+
+                if (createResult.Succeeded)
+                    await userManager.AddToRoleAsync(adminUser, "Admin");
+                else
+                    throw new Exception("Failed to create admin user: " +
+                        string.Join(", ", createResult.Errors.Select(e => e.Description)));
             }
         }
     }
